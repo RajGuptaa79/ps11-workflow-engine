@@ -1,4 +1,4 @@
-from typing import List, Dict, Any, Optional, Literal
+from typing import List, Dict, Any, Optional, Literal, Union
 from pydantic import BaseModel, Field
 
 class TriggerEvent(BaseModel):
@@ -8,7 +8,7 @@ class TriggerEvent(BaseModel):
 class Condition(BaseModel):
     field: str
     operator: Literal["eq", "neq", "gt", "lt", "contains"]
-    value: str | int | float | bool
+    value: Union[str, int, float, bool]
 
 class WorkflowStep(BaseModel):
     stepId: str
