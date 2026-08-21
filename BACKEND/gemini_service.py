@@ -74,6 +74,3 @@ def extract_workflow_ir(requirement: str, project_context: str = "") -> Universa
     
     # Clean and validate through Pydantic
     raw_text = response.text.strip()
-    return UniversalWorkflowIR.model_validate_json(raw_text)
-
-

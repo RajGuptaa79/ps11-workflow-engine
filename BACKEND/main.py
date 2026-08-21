@@ -1,23 +1,43 @@
+import os
 import re
 import json
 import uuid
 import asyncio
-import httpx
+import jwt
 from contextlib import asynccontextmanager
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from fastapi import FastAPI, BackgroundTasks, HTTPException
+from fastapi import FastAPI, BackgroundTasks, HTTPException, Depends
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.middleware.cors import CORSMiddleware
 from sse_starlette.sse import EventSourceResponse
 
 from models import DetectRequest, TriggerRequest, UniversalWorkflowIR
 from gemini_service import extract_workflow_ir
 
-# --- 1. Scheduler & Lifespan Setup ---
+# --- 1. Supabase Auth Configuration ---
+security = HTTPBearer()
+# Replace with your actual secret from Supabase Dashboard -> Project Settings -> API -> JWT Secret
+SUPABASE_JWT_SECRET = os.getenv("SUPABASE_JWT_SECRET", "your-super-secret-jwt-key-from-dashboard")
+
+def verify_supabase_token(credentials: HTTPAuthorizationCredentials = Depends(security)) -> str:
+    try:
+        payload = jwt.decode(
+            credentials.credentials,
+            SUPABASE_JWT_SECRET,
+            algorithms=["HS256"],
+            audience="authenticated"
+        )
+        return payload["sub"]  # Returns the authenticated user's UUID
+    except jwt.PyJWTError:
+        raise HTTPException(status_code=401, detail="Invalid or expired authentication credentials")
+    except Exception as e:
+        raise HTTPException(status_code=401, detail=f"Authentication failed: {str(e)}")
+
+# --- 2. Scheduler & Lifespan Setup ---
 scheduler = AsyncIOScheduler()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Start the continuous loop when the server boots
     scheduler.start()
     yield
     scheduler.shutdown()
@@ -31,11 +51,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# --- 2. State Management ---
+# --- 3. State Management ---
 WORKFLOWS: dict[str, UniversalWorkflowIR] = {}
 RUN_QUEUES: dict[str, asyncio.Queue] = {}
 
-# --- 3. Execution Helpers ---
+# --- 4. Execution Helpers ---
 def resolve_variables(template_str: str, context: dict) -> str:
     def replacer(match):
         path = match.group(1).strip().split(".")
@@ -95,7 +115,6 @@ async def execute_dag(run_id: str, workflow: UniversalWorkflowIR, trigger_payloa
         if not step:
             break
 
-        # Check conditional gate
         if not evaluate_condition(step.condition, context):
             await queue.put({
                 "stepId": step.stepId,
@@ -114,7 +133,6 @@ async def execute_dag(run_id: str, workflow: UniversalWorkflowIR, trigger_payloa
         start_time = asyncio.get_event_loop().time()
         resolved_inputs = resolve_payload(step.inputMapping, context)
         
-        # Simulate / dispatch action execution
         await asyncio.sleep(0.4)
         output_data = {
             "status": "executed",
@@ -138,29 +156,26 @@ async def execute_dag(run_id: str, workflow: UniversalWorkflowIR, trigger_payloa
     await queue.put(None)
 
 async def scheduled_trigger(workflow_id: str):
-    """Helper function for the scheduler to trigger the DAG automatically"""
     workflow = WORKFLOWS.get(workflow_id)
     if not workflow:
         return
     
     run_id = str(uuid.uuid4())
     RUN_QUEUES[run_id] = asyncio.Queue()
-    # Trigger with an empty payload for automated runs
     await execute_dag(run_id, workflow, {"source": "autonomous_schedule"})
 
-# --- 4. API Routes ---
+# --- 5. Protected API Routes ---
 @app.post("/api/v1/detect", response_model=UniversalWorkflowIR)
-async def detect_workflow(req: DetectRequest):
+async def detect_workflow(req: DetectRequest, user_id: str = Depends(verify_supabase_token)):
     try:
         workflow_ir = extract_workflow_ir(req.requirement, req.projectName)
         WORKFLOWS[workflow_ir.workflowId] = workflow_ir
         
-        # If the AI determined this is a continuous automation, loop it
         if workflow_ir.triggerEvent.type == "schedule":
             scheduler.add_job(
                 scheduled_trigger,
                 'interval',
-                minutes=60, # Loops every 60 minutes
+                minutes=60,
                 args=[workflow_ir.workflowId],
                 id=workflow_ir.workflowId,
                 replace_existing=True
@@ -171,7 +186,11 @@ async def detect_workflow(req: DetectRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/api/v1/workflow/trigger")
-async def trigger_workflow(req: TriggerRequest, background_tasks: BackgroundTasks):
+async def trigger_workflow(
+    req: TriggerRequest, 
+    background_tasks: BackgroundTasks, 
+    user_id: str = Depends(verify_supabase_token)
+):
     workflow = WORKFLOWS.get(req.workflowId)
     if not workflow:
         raise HTTPException(status_code=404, detail="Workflow ID not found.")
