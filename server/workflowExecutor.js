@@ -82,9 +82,12 @@ stepOutputs[step.stepId] = output;
     await run.save();
   }
 
-  // We use partial for now because real actions
-  // are not connected yet.
-  run.status = "partial";
+// Mark the run partial only if a step was skipped
+  const hasSkippedStep = run.stepResults.some(
+  (result) => result.status === "skipped"
+);
+
+run.status = hasSkippedStep ? "partial" : "completed";
   run.completedAt = new Date();
 
   await run.save();

@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const runFunction = require("./functionHandlers");
+const runOperation = require("./operationHandlers");
 
 async function executeAction(workflow, step, resolvedInput) {
   // FUNCTION
@@ -44,13 +45,12 @@ if (step.actionType === "operation") {
     );
   }
 
-  return {
-    buttonId: step.buttonId,
-    formId: step.formId,
-    operationType: buttonDefinition.type,
-    input: resolvedInput,
-    message: "Operation definition found successfully",
-  };
+const result = await runOperation(
+  step.buttonId,
+  resolvedInput
+);
+
+return result;
 }
 
   // FORM CREATE
