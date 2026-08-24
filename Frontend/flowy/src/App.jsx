@@ -23,6 +23,7 @@ import HelpPage from "./pages/HelpPage.jsx";
 import AuthPage from "./pages/AuthPage.jsx";
 import { UserProvider } from "./context/UserContext.jsx";
 import { DashboardProvider } from "./context/DashboardContext.jsx";
+import LandingPage from "./pages/LandingPage.jsx";
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -32,13 +33,6 @@ function AnimatedRoutes() {
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route
-          path="/"
-          element={
-            <PageTransition mode="default">
-              <HomePage />
-            </PageTransition>
-          }
-        />
         <Route
           path="/about"
           element={
@@ -88,14 +82,6 @@ function AnimatedRoutes() {
           }
         />
         <Route
-          path="/inventory"
-          element={
-            <PageTransition mode="default">
-              <InventoryPage />
-            </PageTransition>
-          }
-        />
-        <Route
           path="/collaborators"
           element={
             <PageTransition mode="default">
@@ -135,8 +121,23 @@ function AnimatedRoutes() {
             </PageTransition>
           }
         />
-
+        <Route
+          path="/landing"
+          element={
+            <PageTransition mode="default">
+              <LandingPage />
+            </PageTransition>
+          }
+        />
         <Route path="*" element={<Navigate to="/" replace />} />
+        <Route
+          path="/"
+          element={
+            <PageTransition mode="default">
+              <LandingPage />
+            </PageTransition>
+          }
+        />
       </Routes>
     </AnimatePresence>
   );
