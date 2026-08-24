@@ -33,6 +33,21 @@ function AnimatedRoutes() {
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route
+          path="/"
+          element={
+            <PageTransition mode="default">
+              <LandingPage />
+            </PageTransition>
+          }
+        />
+        <Route
+          path="/home"
+          element={
+            <PageTransition mode="default">
+              <HomePage />
+            </PageTransition>
+          }
+        />
         <Route
           path="/about"
           element={
@@ -121,23 +136,7 @@ function AnimatedRoutes() {
             </PageTransition>
           }
         />
-        <Route
-          path="/landing"
-          element={
-            <PageTransition mode="default">
-              <LandingPage />
-            </PageTransition>
-          }
-        />
         <Route path="*" element={<Navigate to="/" replace />} />
-        <Route
-          path="/"
-          element={
-            <PageTransition mode="default">
-              <LandingPage />
-            </PageTransition>
-          }
-        />
       </Routes>
     </AnimatePresence>
   );
