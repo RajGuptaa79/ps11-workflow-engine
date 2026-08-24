@@ -461,8 +461,9 @@
 }
 
 .query-card {
-  width: min(100%, clamp(430px, 42vw, 520px));
-  max-width: 520px;
+  height: 190px;
+  width: min(100%, clamp(830px, 42vw, 900px));
+  max-width: 920px;
   background: rgba(255, 255, 255, 0.92);
   border: 1px solid rgba(115, 115, 115, 0.12);
   border-radius: 24px;
@@ -499,8 +500,8 @@
 
 .query-card__input {
   width: 100%;
-  min-height: clamp(56px, 8vh, 72px);
-  max-height: clamp(92px, 14vh, 126px);
+  min-height: clamp(220px, 8vh, 220px);
+  max-height: clamp(220px, 14vh, 226px);
   resize: none;
   border: 1px solid rgba(120, 120, 120, 0.12);
   border-radius: 18px;

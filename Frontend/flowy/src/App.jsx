@@ -20,6 +20,7 @@ import SettingsPage from "./pages/SettingsPage.jsx";
 import LibraryPage from "./pages/LibraryPage.jsx";
 import { LibraryProvider } from "./context/LibraryContext.jsx";
 import HelpPage from "./pages/HelpPage.jsx";
+import AuthPage from "./pages/AuthPage.jsx";
 import { UserProvider } from "./context/UserContext.jsx";
 import { DashboardProvider } from "./context/DashboardContext.jsx";
 
@@ -51,6 +52,30 @@ function AnimatedRoutes() {
           element={
             <PageTransition mode="default">
               <PricingPage />
+            </PageTransition>
+          }
+        />
+        <Route
+          path="/signin"
+          element={
+            <PageTransition mode="default">
+              <AuthPage initialMode="signin" />
+            </PageTransition>
+          }
+        />
+        <Route
+          path="/signup"
+          element={
+            <PageTransition mode="default">
+              <AuthPage initialMode="signup" />
+            </PageTransition>
+          }
+        />
+        <Route
+          path="/auth"
+          element={
+            <PageTransition mode="default">
+              <AuthPage />
             </PageTransition>
           }
         />

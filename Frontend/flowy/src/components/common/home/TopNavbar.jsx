@@ -55,6 +55,14 @@ export default function TopNavbar() {
           Pricing
         </NavLink>
 
+        <NavLink to="/signin" className={navLinkClass}>
+          Sign in
+        </NavLink>
+
+        <NavLink to="/signup" className={navLinkClass}>
+          Sign up
+        </NavLink>
+
         <ThemeToggle />
 
         <div className="profile-menu" ref={profileRef}>
