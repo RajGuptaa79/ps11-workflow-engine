@@ -39,7 +39,9 @@
 }
 
 .landing-brand {
-  max-width: 56rem;
+  flex: 1 1 auto;
+  max-width: 72rem;
+  min-width: 0;
 }
 
 .landing-brand__eyebrow {
@@ -56,7 +58,7 @@
   font-size: clamp(2.3rem, 1.7rem + 2.1vw, 4.5rem);
   line-height: 0.98;
   color: var(--text);
-  max-width: 12ch;
+  max-width: 22ch;
 }
 
 .landing-actions {
