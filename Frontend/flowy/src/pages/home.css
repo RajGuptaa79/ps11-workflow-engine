@@ -500,8 +500,8 @@
 
 .query-card__input {
   width: 100%;
-  min-height: clamp(220px, 8vh, 220px);
-  max-height: clamp(220px, 14vh, 226px);
+  min-height: clamp(100px, 7vh, 140px);
+  max-height: clamp(100px, 10vh, 160px);
   resize: none;
   border: 1px solid rgba(120, 120, 120, 0.12);
   border-radius: 18px;
