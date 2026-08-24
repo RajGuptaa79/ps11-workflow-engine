@@ -1,4 +1,11 @@
 import { useEffect, useState } from "react";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { useNavigate } from "react-router-dom";
+import { getFirebaseAuth } from "../config/firebase.js";
+import { useUser } from "../context/UserContext.jsx";
 import "./authPage.css";
 
 const SunIcon = () => (
@@ -17,6 +24,24 @@ const MoonIcon = () => (
 export default function AuthPage({ initialMode = "signin" }) {
   const [mode, setMode] = useState(initialMode);
   const [theme, setTheme] = useState("light");
+  const navigate = useNavigate();
+  const {
+    updateUser,
+    setAccessToken,
+    authError,
+    setAuthError,
+    isAuthenticating,
+    setIsAuthenticating,
+  } = useUser();
+  // Form values are ready to send to the authentication backend.
+  const [authForm, setAuthForm] = useState({
+    fullName: "",
+    companyName: "",
+    email: "",
+    businessType: "",
+    password: "",
+    confirmPassword: "",
+  });
 
   const isSignIn = mode === "signin";
 
@@ -31,17 +56,51 @@ export default function AuthPage({ initialMode = "signin" }) {
     setTheme((prev) => (prev === "light" ? "dark" : "light"));
   };
 
-  const handleSubmit = (event) => {
+  const updateAuthForm = (field, value) => {
+    setAuthForm((previous) => ({ ...previous, [field]: value }));
+  };
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (isSignIn) {
-      // TODO: connect auth logic here
-      // Future redirect target after successful sign in:
-      // window.location.href = "http://localhost:5173/home";
-    } else {
-      // TODO: connect sign up logic here
-      // Future redirect target after successful sign up:
-      // window.location.href = "http://localhost:5173/home";
+    if (!authForm.email.trim() || !authForm.password) {
+      setAuthError("Enter your email address and password.");
+      return;
+    }
+
+    if (!isSignIn && authForm.password !== authForm.confirmPassword) {
+      setAuthError("Passwords do not match.");
+      return;
+    }
+
+    setIsAuthenticating(true);
+    setAuthError("");
+
+    try {
+      const auth = getFirebaseAuth();
+      const credentials = isSignIn
+        ? await signInWithEmailAndPassword(
+            auth,
+            authForm.email.trim(),
+            authForm.password,
+          )
+        : await createUserWithEmailAndPassword(
+            auth,
+            authForm.email.trim(),
+            authForm.password,
+          );
+      const firebaseUser = credentials.user;
+
+      updateUser({
+        id: firebaseUser.uid,
+        email: firebaseUser.email ?? authForm.email.trim(),
+      });
+      setAccessToken(await firebaseUser.getIdToken());
+      navigate("/", { replace: true });
+    } catch (error) {
+      setAuthError(error.message ?? "Authentication failed.");
+    } finally {
+      setIsAuthenticating(false);
     }
   };
 
@@ -127,12 +186,26 @@ export default function AuthPage({ initialMode = "signin" }) {
                   <div className="auth-field-grid">
                     <label className="auth-field">
                       <span>Full Name</span>
-                      <input type="text" placeholder="Your full name" />
+                      <input
+                        type="text"
+                        placeholder="Your full name"
+                        value={authForm.fullName}
+                        onChange={(event) =>
+                          updateAuthForm("fullName", event.target.value)
+                        }
+                      />
                     </label>
 
                     <label className="auth-field">
                       <span>Company Name</span>
-                      <input type="text" placeholder="Your company" />
+                      <input
+                        type="text"
+                        placeholder="Your company"
+                        value={authForm.companyName}
+                        onChange={(event) =>
+                          updateAuthForm("companyName", event.target.value)
+                        }
+                      />
                     </label>
                   </div>
                 )}
@@ -141,7 +214,14 @@ export default function AuthPage({ initialMode = "signin" }) {
                   <span>Email Address</span>
                   <div className="auth-input-wrap">
                     <span className="auth-input-icon">✉</span>
-                    <input type="email" placeholder="name@company.com" />
+                    <input
+                      type="email"
+                      placeholder="name@company.com"
+                      value={authForm.email}
+                      onChange={(event) =>
+                        updateAuthForm("email", event.target.value)
+                      }
+                    />
                   </div>
                 </label>
 
@@ -153,6 +233,10 @@ export default function AuthPage({ initialMode = "signin" }) {
                       <input
                         type="text"
                         placeholder="Retail, Manufacturing, Services..."
+                        value={authForm.businessType}
+                        onChange={(event) =>
+                          updateAuthForm("businessType", event.target.value)
+                        }
                       />
                     </div>
                   </label>
@@ -170,7 +254,14 @@ export default function AuthPage({ initialMode = "signin" }) {
 
                   <div className="auth-input-wrap">
                     <span className="auth-input-icon">⌘</span>
-                    <input type="password" placeholder="••••••••" />
+                    <input
+                      type="password"
+                      placeholder="••••••••"
+                      value={authForm.password}
+                      onChange={(event) =>
+                        updateAuthForm("password", event.target.value)
+                      }
+                    />
                     <button
                       type="button"
                       className="auth-ghost-icon"
@@ -186,15 +277,36 @@ export default function AuthPage({ initialMode = "signin" }) {
                     <span>Confirm Password</span>
                     <div className="auth-input-wrap">
                       <span className="auth-input-icon">⌘</span>
-                      <input type="password" placeholder="••••••••" />
+                      <input
+                        type="password"
+                        placeholder="••••••••"
+                        value={authForm.confirmPassword}
+                        onChange={(event) =>
+                          updateAuthForm("confirmPassword", event.target.value)
+                        }
+                      />
                     </div>
                   </label>
                 )}
 
-                <button type="submit" className="auth-submit">
-                  {isSignIn ? "Sign In" : "Create Account"}
+                <button
+                  type="submit"
+                  className="auth-submit"
+                  disabled={isAuthenticating}
+                >
+                  {isAuthenticating
+                    ? "Please wait..."
+                    : isSignIn
+                      ? "Sign In"
+                      : "Create Account"}
                   <span aria-hidden="true">→</span>
                 </button>
+
+                {authError && (
+                  <p className="auth-form-error" role="alert">
+                    {authError}
+                  </p>
+                )}
 
                 <div className="auth-divider">
                   <span>Or continue with</span>

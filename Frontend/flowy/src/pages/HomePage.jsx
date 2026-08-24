@@ -6,6 +6,7 @@ import PolkaField from "../components/common/home/PolkaField.jsx";
 import HomeMotionLayer from "../components/common/home/HomeMotionLayer.jsx";
 import { useLibrary } from "../context/LibraryContext.jsx";
 import { useDashboard } from "../context/DashboardContext.jsx";
+import { API_ENDPOINTS } from "../config/api.js";
 import { useNavigate } from "react-router-dom";
 import "./home.css";
 
@@ -16,17 +17,53 @@ export default function HomePage() {
   const {
     query,
     setQuery,
+    workflow,
+    setWorkflow,
+    setIsGenerating,
+    generationError,
+    setGenerationError,
     isGenerated,
     setIsGenerated,
     isAddMenuOpen,
     setIsAddMenuOpen,
   } = useDashboard();
 
-  const handleGenerate = () => {
-    if (!query.trim()) return;
-    addEntry(query, "");
-    setIsGenerated(true);
-    setIsAddMenuOpen(false);
+  const handleGenerate = async () => {
+    const prompt = query.trim();
+
+    if (!prompt) return;
+
+    setIsGenerating(true);
+    setGenerationError("");
+
+    try {
+      const response = await fetch(API_ENDPOINTS.detectWorkflow, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ prompt }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.detail ?? "Workflow generation failed.");
+      }
+
+      // Keep the full JSON returned by the API, exactly as Swagger shows it.
+      setWorkflow(result);
+      addEntry(prompt, JSON.stringify(result));
+      setIsGenerated(true);
+      setIsAddMenuOpen(false);
+    } catch (error) {
+      setGenerationError(error.message ?? "Workflow generation failed.");
+      setWorkflow(null);
+      setIsGenerated(true);
+      setIsAddMenuOpen(false);
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const handleAddToggle = () => {
@@ -78,7 +115,12 @@ export default function HomePage() {
               </div>
 
               <div className="home-output home-output--visible">
-                <ResultPanel isGenerated={true} query={query} />
+                <ResultPanel
+                  isGenerated={true}
+                  query={query}
+                  workflow={workflow}
+                  error={generationError}
+                />
 
                 <button
                   className="diagram-rail diagram-rail--visible"

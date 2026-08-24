@@ -55,13 +55,7 @@ export default function TopNavbar() {
           Pricing
         </NavLink>
 
-        <NavLink to="/signin" className={navLinkClass}>
-          Sign in
-        </NavLink>
-
-        <NavLink to="/signup" className={navLinkClass}>
-          Sign up
-        </NavLink>
+        
 
         <ThemeToggle />
 
@@ -97,10 +91,11 @@ export default function TopNavbar() {
                 <div className="profile-menu__label">Signed in as</div>
                 <div
                   className="profile-menu__user-id"
-                  title={user?.id || "No user id available"}
+                  title={user?.email || user?.id || "No user id available"}
                 >
-                  {user?.id || "No user id available"}
+                  {user?.email || user?.id || "No user id available"}
                 </div>
+                {user?.email && <div>{user.id}</div>}
 
                 <button
                   type="button"

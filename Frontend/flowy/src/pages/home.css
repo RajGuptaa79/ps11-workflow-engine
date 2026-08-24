@@ -500,8 +500,8 @@
 
 .query-card__input {
   width: 100%;
-  min-height: clamp(220px, 8vh, 220px);
-  max-height: clamp(220px, 14vh, 226px);
+  min-height: clamp(120px, 8vh, 120px);
+  max-height: clamp(120px, 14vh, 120px);
   resize: none;
   border: 1px solid rgba(120, 120, 120, 0.12);
   border-radius: 18px;
@@ -733,6 +733,21 @@
   font-size: clamp(14px, 0.95vw, 18px);
   color: var(--text);
   opacity: 0.72;
+}
+
+.result-panel__content--output {
+  display: block;
+  overflow: auto;
+  text-align: left;
+}
+
+.result-panel__output {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: var(--text);
+  font-size: clamp(12px, 0.85vw, 15px);
+  line-height: 1.5;
 }
 
 .diagram-rail {
