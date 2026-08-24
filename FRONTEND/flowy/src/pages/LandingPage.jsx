@@ -1,7 +1,5 @@
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import TopNavbar from "../components/common/home/TopNavbar.jsx";
-import SideNavbar from "../components/common/home/SideNavbar.jsx";
 import PolkaField from "../components/common/home/PolkaField.jsx";
 import { useTheme } from "../context/ThemeContext.jsx";
 import libraryShot from "../assets/library_image.png";
@@ -11,10 +9,10 @@ import "./landingPage.css";
 
 const landingLinks = [
   { label: "Overview", target: "landing-overview" },
-  { label: "Inventory", target: "landing-inventory" },
-  { label: "Library", target: "landing-library" },
-  { label: "Collaborators", target: "landing-collaborators" },
-  { label: "Pricing", target: "landing-pricing" },
+  { label: "Inventory", route: "/inventory" },
+  { label: "Library", route: "/library" },
+  { label: "Collaborators", route: "/collaborators" },
+  { label: "Pricing", route: "/pricing" },
 ];
 
 const pricingPlans = [
@@ -77,11 +75,7 @@ export default function LandingPage() {
 
   return (
     <div className="home-main landing-main">
-      <TopNavbar />
-
       <div className="home-shell">
-        <SideNavbar />
-
         <main className="home-workspace landing-workspace">
           <PolkaField />
 
@@ -121,10 +115,12 @@ export default function LandingPage() {
             >
               {landingLinks.map((item) => (
                 <button
-                  key={item.target}
+                  key={item.route ?? item.target}
                   type="button"
                   className="landing-anchor-nav__link"
-                  onClick={() => scrollToSection(item.target)}
+                  onClick={() =>
+                    item.route ? navigate(item.route) : scrollToSection(item.target)
+                  }
                 >
                   {item.label}
                 </button>
