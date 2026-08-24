@@ -1,14 +1,19 @@
 import firebase_admin
+
 from firebase_admin import credentials, auth
 
 from app.core.config import settings
 
 
 def initialize_firebase():
+
     if firebase_admin._apps:
         return
 
-    private_key = settings.firebase_private_key.replace("\\n", "\n")
+    private_key = settings.firebase_private_key.replace(
+        "\\n",
+        "\n"
+    )
 
     credential = credentials.Certificate(
         {
@@ -31,11 +36,15 @@ def initialize_firebase():
 
 
 def verify_token(id_token: str):
+
     initialize_firebase()
 
     try:
-        decoded_token = auth.verify_id_token(id_token)
-        return decoded_token
+
+        return auth.verify_id_token(id_token)
 
     except Exception as exc:
-        raise ValueError("Invalid or expired authentication token.") from exc
+
+        raise ValueError(
+            "Invalid or expired authentication token."
+        ) from exc

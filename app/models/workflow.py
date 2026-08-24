@@ -27,26 +27,18 @@ class Condition(BaseModel):
     )
 
     on_true: str = Field(
-        description="Step ID to execute when the condition is true."
+        description="Step ID to execute when condition is true."
     )
 
     on_false: str = Field(
-        description="Step ID to execute when the condition is false."
+        description="Step ID to execute when condition is false."
     )
 
 
 class Step(BaseModel):
-    id: str = Field(
-        description="Unique identifier for the workflow step."
-    )
-
-    name: str = Field(
-        description="Human-readable name of the workflow step."
-    )
-
-    description: str = Field(
-        description="Detailed explanation of what this step does."
-    )
+    id: str
+    name: str
+    description: str
 
     type: StepType
 
@@ -55,19 +47,11 @@ class Step(BaseModel):
     )
 
     input: dict[str, Any] = Field(
-        default_factory=dict,
-        description="Input variables required by this step."
+        default_factory=dict
     )
 
-    on_success: str | None = Field(
-        default=None,
-        description="Next step ID when this step succeeds."
-    )
-
-    on_failure: str | None = Field(
-        default=None,
-        description="Next step ID when this step fails."
-    )
+    on_success: str | None = None
+    on_failure: str | None = None
 
     condition: Condition | None = None
 
@@ -82,8 +66,7 @@ class UniversalWorkflowIR(BaseModel):
     steps: list[Step]
 
     variables: dict[str, Any] = Field(
-        default_factory=dict,
-        description="Variables available to the workflow."
+        default_factory=dict
     )
 
     start_step: str
