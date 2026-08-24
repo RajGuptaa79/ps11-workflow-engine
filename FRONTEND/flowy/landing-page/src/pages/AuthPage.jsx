@@ -14,9 +14,23 @@ const MoonIcon = () => (
   </svg>
 );
 
+const EyeIcon = () => (
+  <svg viewBox="0 0 24 24" aria-hidden="true" width="18" height="18">
+    <path d="M12 5C7 5 2.73 8.11 1 12.46c1.73 4.35 6 7.54 11 7.54s9.27-3.19 11-7.54C21.27 8.11 17 5 12 5zm0 12c-2.38 0-4.5-1.62-4.5-3.5S9.62 10 12 10s4.5 1.62 4.5 3.5-2.12 3.5-4.5 3.5z" fill="currentColor"/>
+  </svg>
+);
+
+const EyeOffIcon = () => (
+  <svg viewBox="0 0 24 24" aria-hidden="true" width="18" height="18">
+    <path d="M11.83 9L5.5 2.5c-1.1-.9-2.7-.9-3.8 0-.9 1.1-.9 2.7 0 3.8L8 13c-.7 1.1-1 2.3-1 3.7 0 5.2 4.3 9.5 9.5 9.5 1.4 0 2.6-.3 3.7-1l6.5 6.5c1.1.9 2.7.9 3.8 0 .9-1.1.9-2.7 0-3.8L11.83 9zm.01 14c-3.87 0-7-3.13-7-7 0-1.2.3-2.3.8-3.3l9.5 9.5c-1 .5-2.1.8-3.3.8z" fill="currentColor"/>
+  </svg>
+);
+
 export default function AuthPage({ initialMode = "signin" }) {
   const [mode, setMode] = useState(initialMode);
   const [theme, setTheme] = useState("light");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const isSignIn = mode === "signin";
 
@@ -170,13 +184,20 @@ export default function AuthPage({ initialMode = "signin" }) {
 
                   <div className="auth-input-wrap">
                     <span className="auth-input-icon">⌘</span>
-                    <input type="password" placeholder="••••••••" />
+                    <input 
+                      type={showPassword ? "text" : "password"} 
+                      placeholder="••••••••" 
+                    />
                     <button
                       type="button"
                       className="auth-ghost-icon"
-                      aria-label="Toggle password visibility"
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setShowPassword(!showPassword);
+                      }}
                     >
-                      ◉
+                      {showPassword ? <EyeOffIcon /> : <EyeIcon />}
                     </button>
                   </div>
                 </label>
@@ -186,7 +207,21 @@ export default function AuthPage({ initialMode = "signin" }) {
                     <span>Confirm Password</span>
                     <div className="auth-input-wrap">
                       <span className="auth-input-icon">⌘</span>
-                      <input type="password" placeholder="••••••••" />
+                      <input 
+                        type={showConfirmPassword ? "text" : "password"} 
+                        placeholder="••••••••" 
+                      />
+                      <button
+                        type="button"
+                        className="auth-ghost-icon"
+                        aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setShowConfirmPassword(!showConfirmPassword);
+                        }}
+                      >
+                        {showConfirmPassword ? <EyeOffIcon /> : <EyeIcon />}
+                      </button>
                     </div>
                   </label>
                 )}
