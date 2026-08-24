@@ -99,15 +99,32 @@ export default function PolkaField() {
       mouseRef.current.active = false;
     };
 
-    resize();
-    draw();
+    // Ensure parent has dimensions before starting animation
+    const initializeAnimation = () => {
+      const rect = parent.getBoundingClientRect();
+      // Only proceed if parent has valid dimensions
+      if (rect.width > 0 && rect.height > 0) {
+        resize();
+        draw();
+        window.addEventListener("resize", resize);
+        parent.addEventListener("mousemove", handleMove);
+        parent.addEventListener("mouseleave", handleLeave);
+      } else {
+        // Retry after a short delay if dimensions not ready
+        setTimeout(initializeAnimation, 100);
+      }
+    };
 
-    window.addEventListener("resize", resize);
-    parent.addEventListener("mousemove", handleMove);
-    parent.addEventListener("mouseleave", handleLeave);
+    // Use requestAnimationFrame to ensure DOM has settled
+    const frameId = requestAnimationFrame(() => {
+      initializeAnimation();
+    });
 
     return () => {
-      cancelAnimationFrame(animationRef.current);
+      cancelAnimationFrame(frameId);
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
       window.removeEventListener("resize", resize);
       parent.removeEventListener("mousemove", handleMove);
       parent.removeEventListener("mouseleave", handleLeave);
