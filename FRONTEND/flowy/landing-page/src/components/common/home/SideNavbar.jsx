@@ -18,7 +18,7 @@ export default function SideNavbar() {
         </div>
 
         <nav className="side-navbar__nav">
-          <NavLink to="/" end className={navItemClass}>
+          <NavLink to="/home" end className={navItemClass}>
             <span className="side-navbar__icon">⊞</span>
             <span>Dashboard</span>
           </NavLink>

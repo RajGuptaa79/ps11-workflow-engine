@@ -136,6 +136,15 @@ function AnimatedRoutes() {
           }
         />
 
+        <Route
+          path="/home"
+          element={
+            <PageTransition mode="default">
+              <HomePage />
+            </PageTransition>
+          }
+        />
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AnimatePresence>

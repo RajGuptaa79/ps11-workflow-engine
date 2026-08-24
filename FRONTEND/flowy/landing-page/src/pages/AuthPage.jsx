@@ -37,16 +37,16 @@ const EyeOffIcon = () => (
 export default function AuthPage({ initialMode = "signin" }) {
   const navigate = useNavigate();
   const { updateUser } = useUser();
-  
+
   const [mode, setMode] = useState(initialMode);
   const [theme, setTheme] = useState("light");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  
+
   // Form state for Sign In
   const [signInEmail, setSignInEmail] = useState("");
   const [signInPassword, setSignInPassword] = useState("");
-  
+
   // Form state for Sign Up
   const [signUpFullName, setSignUpFullName] = useState("");
   const [signUpCompany, setSignUpCompany] = useState("");
@@ -77,14 +77,14 @@ export default function AuthPage({ initialMode = "signin" }) {
         alert("Please enter both email and password");
         return;
       }
-      
+
       // Store user credentials in context
       updateUser({
         email: signInEmail,
         password: signInPassword,
         isAuthenticated: true,
       });
-      
+
       // Redirect to home page
       navigate("/home");
     } else {
@@ -93,12 +93,12 @@ export default function AuthPage({ initialMode = "signin" }) {
         alert("Please fill in all required fields");
         return;
       }
-      
+
       if (signUpPassword !== signUpConfirmPassword) {
         alert("Passwords do not match");
         return;
       }
-      
+
       // Store user credentials in context
       updateUser({
         fullName: signUpFullName,
@@ -108,7 +108,7 @@ export default function AuthPage({ initialMode = "signin" }) {
         password: signUpPassword,
         isAuthenticated: true,
       });
-      
+
       // Redirect to home page
       navigate("/home");
     }
@@ -196,9 +196,9 @@ export default function AuthPage({ initialMode = "signin" }) {
                   <div className="auth-field-grid">
                     <label className="auth-field">
                       <span>Full Name</span>
-                      <input 
-                        type="text" 
-                        placeholder="Your full name" 
+                      <input
+                        type="text"
+                        placeholder="Your full name"
                         value={signUpFullName}
                         onChange={(e) => setSignUpFullName(e.target.value)}
                       />
@@ -206,9 +206,9 @@ export default function AuthPage({ initialMode = "signin" }) {
 
                     <label className="auth-field">
                       <span>Company Name</span>
-                      <input 
-                        type="text" 
-                        placeholder="Your company" 
+                      <input
+                        type="text"
+                        placeholder="Your company"
                         value={signUpCompany}
                         onChange={(e) => setSignUpCompany(e.target.value)}
                       />
@@ -220,11 +220,15 @@ export default function AuthPage({ initialMode = "signin" }) {
                   <span>Email Address</span>
                   <div className="auth-input-wrap">
                     <span className="auth-input-icon">✉</span>
-                    <input 
-                      type="email" 
-                      placeholder="name@company.com" 
+                    <input
+                      type="email"
+                      placeholder="name@company.com"
                       value={isSignIn ? signInEmail : signUpEmail}
-                      onChange={(e) => isSignIn ? setSignInEmail(e.target.value) : setSignUpEmail(e.target.value)}
+                      onChange={(e) =>
+                        isSignIn
+                          ? setSignInEmail(e.target.value)
+                          : setSignUpEmail(e.target.value)
+                      }
                     />
                   </div>
                 </label>
@@ -260,7 +264,11 @@ export default function AuthPage({ initialMode = "signin" }) {
                       type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
                       value={isSignIn ? signInPassword : signUpPassword}
-                      onChange={(e) => isSignIn ? setSignInPassword(e.target.value) : setSignUpPassword(e.target.value)}
+                      onChange={(e) =>
+                        isSignIn
+                          ? setSignInPassword(e.target.value)
+                          : setSignUpPassword(e.target.value)
+                      }
                     />
                     <button
                       type="button"
@@ -287,7 +295,9 @@ export default function AuthPage({ initialMode = "signin" }) {
                         type={showConfirmPassword ? "text" : "password"}
                         placeholder="••••••••"
                         value={signUpConfirmPassword}
-                        onChange={(e) => setSignUpConfirmPassword(e.target.value)}
+                        onChange={(e) =>
+                          setSignUpConfirmPassword(e.target.value)
+                        }
                       />
                       <button
                         type="button"

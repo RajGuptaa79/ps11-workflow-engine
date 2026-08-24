@@ -18,8 +18,8 @@ const landingLinks = [
 const pricingPlans = [
   {
     name: "Starter",
-    price: "$0",
-    subtitle: "For testing the workflow and exploring the product.",
+    price: "₹0",
+    subtitle: "Basic / Free Plan ",
     features: [
       "Single workspace",
       "Basic prompt history",
@@ -31,8 +31,8 @@ const pricingPlans = [
   },
   {
     name: "Pro",
-    price: "$19",
-    subtitle: "For active builders who need better control and speed.",
+    price: "₹499",
+    subtitle: "Mid - Cap Plan",
     features: [
       "Expanded inventory management",
       "Reusable prompt library",
@@ -44,9 +44,8 @@ const pricingPlans = [
   },
   {
     name: "Scale",
-    price: "$49",
-    subtitle:
-      "For teams running inventory, prompts, and collaboration together.",
+    price: "₹999",
+    subtitle: "Large - Cap Plan",
     features: [
       "Priority team collaboration",
       "High-volume inventory operations",
@@ -119,7 +118,9 @@ export default function LandingPage() {
                   type="button"
                   className="landing-anchor-nav__link"
                   onClick={() =>
-                    item.route ? navigate(item.route) : scrollToSection(item.target)
+                    item.route
+                      ? navigate(item.route)
+                      : scrollToSection(item.target)
                   }
                 >
                   {item.label}
